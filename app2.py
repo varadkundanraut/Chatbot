@@ -164,6 +164,8 @@ def main():
                     st.error(f"Error occurred during chat_groq execution: {str(e)}")
                     ai_response = "An error occurred while fetching response. Please try again."
 
+                st.session_state.current_question = user_message  # Store for display
+
                 # Display the current output prompt
                 st.session_state.current_prompt = ai_response
 
@@ -196,6 +198,8 @@ def main():
                 st.error(f"Error occurred during chat_groq execution: {str(e)}")
                 ai_response = "An error occurred while fetching response. Please try again."
 
+            st.session_state.current_question = user_message  # Store for display
+
             # Display the current output prompt
             st.session_state.current_prompt = ai_response
 
@@ -206,15 +210,34 @@ def main():
             # Clear the input field
             st.session_state.user_input = ""
 
+    
+
+    # Display full chat history using Streamlit's chat_message
+    if "chat_history" in st.session_state:
+        for chat in st.session_state.chat_history:
+            with st.chat_message(chat["role"]):
+                st.markdown(chat["content"])
+
+
+    # if "current_question" in st.session_state and st.session_state.current_question:
+    #     st.markdown(f"**Current Question:** {st.session_state.current_question}")
+
     st.text_area("Enter your question:", key="user_input")
     if st.session_state.vectorstore is not None:
         st.button('Submit', on_click=submit_with_doc)  
     else:
         st.button('Submit', on_click=submit_without_doc)
 
-    # Display the current output prompt if available
-    if st.session_state.current_prompt:
-        st.write(st.session_state.current_prompt)
+    # # Display user's current question in chat format
+    # if "current_question" in st.session_state and st.session_state.current_question:
+    #     with st.chat_message("user"):
+    #         st.markdown(st.session_state.current_question)
+
+    # # Display assistant's response in chat format
+    # if "current_prompt" in st.session_state and st.session_state.current_prompt:
+    #     with st.chat_message("assistant"):
+    #         st.markdown(st.session_state.current_prompt)
+
 
     # Button to generate chat summary
     if st.button('Generate Chat Summary'):
